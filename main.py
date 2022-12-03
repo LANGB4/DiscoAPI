@@ -4,16 +4,13 @@ from flask_restful import Api, Resource
 app = Flask(__name__)
 api = Api(app)
 
-names = {'tim': {'age': 19, 'gender': 'male'},
-        'bill': {'age': 109, 'gender': 'female'}}
+sights = {}
 
-class HelloWorld(Resource):
-    def get(self, name):
-        return names[name]
+class Sights(Resource):
+    def get(self, sight_id):
+        return sights[sight_id]
 
-    
-
-api.add_resource(HelloWorld, '/helloworld/<string:name>')
+api.add_resource(Sights, '/sight/<int:sight_id>')
 
 if __name__ == '__main__':
     app.run(debug= True)
