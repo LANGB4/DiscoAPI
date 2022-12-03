@@ -3,7 +3,7 @@ import requests
 
 BASE = 'http://127.0.0.1:5000/'
 
-response = requests.get(BASE + 'helloworld/bill')
+response = requests.put(BASE + 'sight/1', {'name': 'Bundeshaus'})#, 'text': 'sch schono schön so', 'zip': 3012})
 
-print(response.json())
+print('RESPONSE---->', response.json())
 
