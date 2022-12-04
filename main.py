@@ -1,5 +1,5 @@
 from flask import Flask, request, abort
-from flask_restful import Api, Resource, reqparse
+from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -15,45 +15,81 @@ class SightModel(db.Model):
 
     def __repr__(self):
         return f'Sight(name = {self.name}, text = {self.text}, zip = {self.zip}'
-
+        
+'''
+-- Initial setup of DB, only execute once! Overwrites entries...
 with app.app_context():
     db.create_all()
+'''
 
-sight_parser = reqparse.RequestParser()
-sight_parser.add_argument('name', type=str, help='name required..', location='form', required=True)
-sight_parser.add_argument('text', type=str, help='text required..', location='form', required=True)
-sight_parser.add_argument('zip', type=int, help='zip code required..', location='form', required=True)
+sight_put_args = reqparse.RequestParser()
+sight_put_args.add_argument('name', type=str, help='name required..', location='form', required=True)
+sight_put_args.add_argument('text', type=str, help='text required..', location='form', required=True)
+sight_put_args.add_argument('zip', type=int, help='zip code required..', location='form', required=True)
 
-sights = {}
+sight_update_args = reqparse.RequestParser()
+sight_update_args.add_argument('name', type=str, help='name required..', location='form')
+sight_update_args.add_argument('text', type=str, help='text required..', location='form')
+sight_update_args.add_argument('zip', type=int, help='zip code required..', location='form')
 
-def abort_if_not_exists(sight_id):
-    if sight_id not in sights:
-        abort(404, 'sight_id does not exist...')
 
-def abort_if_exists(sight_id):
-    if sight_id in sights:
-        abort(409, 'sight_id already exists...')
+resource_fields = {
+    'id': fields.Integer,
+    'name': fields.String,
+    'text': fields.String,
+    'zip': fields.Integer
+}
+
 
 class Sights(Resource):
 
+    @marshal_with(resource_fields)
     def get(self, sight_id):
-        print('--GET----->', sight_id)
-        abort_if_not_exists(sight_id)
-        return sights[sight_id]
+        result = SightModel.query.filter_by(id=sight_id).first()
+        if not result:
+            abort(404, 'Sight id not found...')
+        return result
 
-    
+    @marshal_with(resource_fields)
     def put(self, sight_id):
-        abort_if_exists(sight_id)
-        print('--PUT--FORM---->',request.form)
-        args = sight_parser.parse_args()
-        print('--PUT--ARGS---->', args)
-        sights[sight_id] = args
-        return sights[sight_id], 201
+        args = sight_put_args.parse_args()
+        result = SightModel.query.filter_by(id=sight_id).first()
+        if result:
+            abort(409, 'sigth id taken...')
+
+        sight = SightModel(id=sight_id, name=args['name'], text=args['text'], zip=args['zip'])
+        db.session.add(sight)
+        db.session.commit()
+        return sight, 201
+
+
+    @marshal_with(resource_fields)
+    def patch(self, sight_id):
+        args = sight_update_args.parse_args()
+        result = SightModel.query.filter_by(id=sight_id).first()
+        if not result:
+            abort(404, 'Sight id not found, cannot update...')
+        
+        if  args['name']:
+            result.name = args['name']
+        if args['text']:
+            result.text = args['text']
+        if args['zip']:
+            result.zip = args['zip']
+
+        
+        db.session.commit()
+        return result
+
+
+
+
+
+
 
     def delete(self, sight_id):
         print('------------delete called--------')
-        abort_if_not_exists(sight_id)
-        del sights[sight_id]
+        
         return '', 204
 
 
