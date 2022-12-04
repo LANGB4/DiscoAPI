@@ -1,8 +1,23 @@
 from flask import Flask, request, abort
 from flask_restful import Api, Resource, reqparse
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 api = Api(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db = SQLAlchemy(app)
+
+class SightModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    text = db.Column(db.String(500))
+    zip = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f'Sight(name = {self.name}, text = {self.text}, zip = {self.zip}'
+
+with app.app_context():
+    db.create_all()
 
 sight_parser = reqparse.RequestParser()
 sight_parser.add_argument('name', type=str, help='name required..', location='form', required=True)
