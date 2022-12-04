@@ -34,7 +34,7 @@ response = requests.get(BASE + 'sight/2')
 print('GET---->',response.json())
 
 
-response = requests.patch(BASE + 'sight/2', {})
+response = requests.patch(BASE + 'sight/2', {'text': 'Guns n rosengardens', 'zip': 3000})
 print('PATCH---->',response.json())
 
 
