@@ -13,7 +13,7 @@ sights = {}
 
 def abort_if_not_exists(sight_id):
     if sight_id not in sights:
-        abort(404, 'sight_id not valid...')
+        abort(404, 'sight_id does not exist...')
 
 def abort_if_exists(sight_id):
     if sight_id in sights:
@@ -22,22 +22,24 @@ def abort_if_exists(sight_id):
 class Sights(Resource):
 
     def get(self, sight_id):
+        print('--GET----->', sight_id)
         abort_if_not_exists(sight_id)
         return sights[sight_id]
 
     
     def put(self, sight_id):
         abort_if_exists(sight_id)
-        print('FORM---->',request.form)
+        print('--PUT--FORM---->',request.form)
         args = sight_parser.parse_args()
-        print('ARGS---->', args)
+        print('--PUT--ARGS---->', args)
         sights[sight_id] = args
         return sights[sight_id], 201
 
     def delete(self, sight_id):
+        print('------------delete called--------')
         abort_if_not_exists(sight_id)
         del sights[sight_id]
-        return sight_id + 'deleted', 204
+        return '', 204
 
 
 

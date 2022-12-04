@@ -13,9 +13,9 @@ for i in range(len(data)):
     print('RESPONSE, PUT---->', response.json())
 
 input('press enter to delete')
-response = requests.delete(BASE + 'video/1')
+response = requests.delete(BASE + 'sight/0')
 print('RESPONSE, DELETE---->', response)
 
 input('press enter to get')
-response = requests.get(BASE + 'sight/1')
+response = requests.get(BASE + 'sight/2')
 print('RESPONSE, GET---->', response.json())
