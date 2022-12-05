@@ -45,10 +45,14 @@ class Sights(Resource):
 
     @marshal_with(resource_fields)
     def get(self, sight_id):
-        result = SightModel.query.filter_by(id=sight_id).first()
+        if sight_id == 'all':
+            result = SightModel.query.all()
+        else:    
+            result = SightModel.query.filter_by(id=sight_id).first()
         if not result:
             abort(404, 'Sight id not found...')
         return result
+
 
     @marshal_with(resource_fields)
     def put(self, sight_id):
