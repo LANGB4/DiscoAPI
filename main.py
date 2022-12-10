@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, abort
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
 
@@ -17,11 +17,11 @@ class SightModel(db.Model):
         return f'Sight(name = {self.name}, text = {self.text}, zip = {self.zip}'
         
 '''
--- Initial setup of DB, only execute once! Overwrites entries...
+#-- Initial setup of DB, only execute once! Overwrites entries...
 with app.app_context():
     db.create_all()
-'''
 
+'''
 sight_put_args = reqparse.RequestParser()
 sight_put_args.add_argument('name', type=str, help='name required..', location='form', required=True)
 sight_put_args.add_argument('text', type=str, help='text required..', location='form', required=True)
@@ -81,7 +81,6 @@ class Sights(Resource):
         return result
 
     def delete(self, sight_id):
-        print('------------delete called--------')   
         result = SightModel.query.filter_by(id=sight_id).first()
         if not result:
             abort(404, 'Sight id not found...')
